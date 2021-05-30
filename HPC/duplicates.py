@@ -3,7 +3,7 @@ import pandas as pd
 from fuzzywuzzy import fuzz
 data = []
 
-inputFile = '../Stage2/datasets/english/english100.json'
+inputFile = '../HW4/datasets/english/english100.json'
 with open(inputFile, "r") as f:
     for line in f:
         'sdasd'
