@@ -1,12 +1,12 @@
-current_index: -1
-filename: Persona_en_N0
+current_index: 51
+filename: ../datasets/Persona_violence_es_N3
 source_lang: auto
 tags:
-  - vaccines
-  - vaccination
-  - mental-health
-  - school-reopening
-  - household-violence
-  - NONE
-target_lang: en
-translate: false
+- vaccines
+- vaccination
+- mental-health
+- school-reopening
+- household-violence
+- NONE
+target_lang: es
+translate: true
