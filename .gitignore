@@ -178,16 +178,19 @@ Stage 1/_short.json
 Stage 1/.zip
 
 
-# Stage2
-Stage2/datasets
-Stage2/results_punto1
-Stage2/prueba.py
-Stage2/models_hpc
+# HW4
+HW4/datasets
+HW4/results_punto1
+HW4/prueba.py
+HW4/models_hpc
 
-Stage2/prueba.py
+HW4/prueba.py
 
 HPC/models_hpc/
 
-PUNTO4/gateTagging/
+# PUNTO4
+PUNTO4/data
+PUNTO4/models
 
-PUNTO4/models/117M/
+
+PUNTO4/gateTagging/
