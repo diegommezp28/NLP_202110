@@ -187,3 +187,7 @@ Stage2/models_hpc
 Stage2/prueba.py
 
 HPC/models_hpc/
+
+PUNTO4/gateTagging/
+
+PUNTO4/models/117M/
