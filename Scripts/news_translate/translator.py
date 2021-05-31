@@ -36,7 +36,7 @@ def translate(index, text, target, source='auto', sleep=1):
             return
         print(e)
         print(f'Failed to translate, waiting {sleep+1} seconds to try again')
-        return translate(text, target, source, sleep+1)
+        return translate(index, text, target, source, sleep+1)
 
 
 def translate_text(index, text, target, source='auto', n=5000):
