@@ -1,5 +1,5 @@
-current_index: -1
-filename: Persona_en_N0
+current_index: 26
+filename: ../tagged2iteration/1000simpleTagged_es
 source_lang: auto
 tags:
   - vaccines
@@ -8,5 +8,5 @@ tags:
   - school-reopening
   - household-violence
   - NONE
-target_lang: en
+target_lang: es
 translate: false

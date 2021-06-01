@@ -1,11 +1,10 @@
-
 from deep_translator import GoogleTranslator
 
 # %%
 import json
 import os
 import yaml
-import pickle as pk
+import pickle5 as pk
 import pandas as pd
 
 
@@ -15,6 +14,7 @@ def pickleToJson(path):
         df = pk.load(output_file)
     jsonFileName = path.replace(".pkl", ".json")
     df.to_json(jsonFileName, orient="records", lines=True)
+
 
 #%%
 with open("./config.yaml", "r+") as file:
@@ -35,7 +35,9 @@ with open("./config.yaml", "r+") as file:
         os.system("cls" if os.name == "nt" else "clear")
 
     def tagInput():
-        tag = input("\nPlease select a tag:" ) #\nOr type 'save' to save your progress")
+        tag = input(
+            "\nPlease select a tag:"
+        )  # \nOr type 'save' to save your progress")
         try:
             index = int(tag)
             if index not in range(0, len(tags)):
@@ -49,9 +51,10 @@ with open("./config.yaml", "r+") as file:
     with open(inputFile, "r") as inf:
         with open(outputFile, "a") as outf:
             for i, line in enumerate(inf):
-                if i <= config["current_index"]: continue
+                if i <= config["current_index"]:
+                    continue
                 json_line = json.loads(line)
-                
+
                 print("Tags:")
                 for index, tag in enumerate(tags):
                     print(f"• {tag} [{index}]")
@@ -59,7 +62,9 @@ with open("./config.yaml", "r+") as file:
                 print("\nOriginal:")
                 print(json_line["text"])
                 if translate:
-                    translated = GoogleTranslator(source='auto', target='es').translate(json_line["text"])
+                    translated = GoogleTranslator(source="auto", target="es").translate(
+                        json_line["text"]
+                    )
                     print()
                     print("Translated:")
                     print(translated)
@@ -67,7 +72,7 @@ with open("./config.yaml", "r+") as file:
                 json_line["tag"] = tagInput()
                 print("after")
                 json.dump(json_line, outf)
-                outf.write('\n')
+                outf.write("\n")
                 config["current_index"] = i
                 file.seek(0)
                 file.truncate()
