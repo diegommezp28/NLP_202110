@@ -5,9 +5,21 @@ import yaml
 import time
 from tqdm import tqdm
 from functools import partial
-import warnings
+from datasets import load_dataset
+import pickle as pk
 
 failed = 'failed.jsonl'
+dataset = load_dataset("covid_qa_deepset")
+dataset_completo = dataset["train"]
+
+def read_dataframe(dataset):
+    contexts = []
+    questions = []
+    answers = []
+    dataset.map(lambda example: contexts.append(example['context']))
+    dataset.map(lambda example: questions.append(example['question']))
+    dataset.map(lambda example: answers.append(example['answers']))
+    return contexts, questions, answers
 
 def logFail(index, target, source, file):
     with open(file, 'a') as f:
@@ -17,11 +29,12 @@ def logFail(index, target, source, file):
         json_line['source']=source
         json.dump(json_line, f)
 
-
 def close(files):
     for file in files:
         file.close()
 
+
+contexts, questions, answers = read_dataframe(dataset_completo)
 
 def translate(index, text, target, source='auto', sleep=1):
     try:
@@ -63,44 +76,45 @@ def rawincount(filename):
 
 with open("./config.yaml", "r+") as file:
     config = yaml.safe_load(file)
-    filename = config["filename"]
-    inputFile = f"{filename}.jsonl"
     source_lang = config["source_lang"]
-    langs = config["langs"]
-    num_langs = len(langs)
-    outputFiles = []
+    lang = config["lang"]
 
-    num_lines = config["num_lines"] = config["num_lines"] if "num_lines" in config else rawincount(inputFile)
-    file.seek(0)
-    file.truncate()
-    yaml.dump(config, file)
+    num_files = len(contexts)
 
+    count_usables = []
+    count_no_usables = []
+    contexts_tra = []
+    questions_tra = []
+    answers_tra = []
     try:
-        for i in range(num_langs):
-            outputFiles.append(open(f"{filename}_{langs[i]}.jsonl", 'a'))
+        for i in range(num_files):
+            context = contexts[i]
+            #print("contexto og",context)
+            question = questions[i]
+            answer = answers[i]["text"][0]
+            #print("answer og",answer)
+            context_tra = translate_text(i,context,lang)
+            #print("contexto",context_traducido)
+            answer_tra_texto = translate_text(i,answer,lang)
+            #print("respuesta",answer_traducido)
+            if answer_tra_texto in context_tra:
+                contexts_tra.append(context_tra)
+                start = context_tra.index(answer_tra_texto)
+                answer_tra = {'answer_start':[start], 'text':[answer_tra_texto]}
+                answers_tra.append(answer_tra)
+                question_tra = translate_text(i,question,lang)
+                questions_tra.append(question_tra)
+                count_usables.append(i)
+            else:
+                count_no_usables.append(i)
+            print(f'Traducidos: {str(len(count_usables))}, no traducido: {str(len(count_no_usables))}')
 
-        with open(inputFile, "r") as inf:
-            for i, line in enumerate(tqdm(inf, total=num_lines)):
-                if i <= config["current_index"]:
-                    continue
-                lang_i = i % num_langs
-                json_line = json.loads(line)
+        with open("questions.pkl", "wb") as model_file:
+            pk.dump(questions_tra, model_file)
+        with open("answers.pkl", "wb") as model_file:
+            pk.dump(answers_tra, model_file)
+        with open("contexts.pkl", "wb") as model_file:
+            pk.dump(contexts_tra, model_file)
 
-                if langs[lang_i] != source_lang:
-                    translated = translate_text(i, json_line["body"], langs[lang_i], source_lang)
-                    if not translated: continue
-                    json_line["body"] = translated
-                json_line["language"] = langs[lang_i]
-
-                json.dump(json_line, outputFiles[lang_i])
-                outputFiles[lang_i].write('\n')
-                config["current_index"] = i
-                file.seek(0)
-                file.truncate()
-                yaml.dump(config, file)
-        close(outputFiles)
     except Exception as e:
         print(e)
-
-    finally:
-        close(outputFiles)
