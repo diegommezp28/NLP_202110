@@ -5,21 +5,41 @@ from tqdm import tqdm
 import pickle as pk
 import torch
 import sys
+from transformers import BertForQuestionAnswering, AutoTokenizer
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    if len(args) != 3:
+    if len(args) != 2:
         print('sorry not enough arguments')
         exit()
-    input_model_file = args[0]
-    input_train_dataset_file = args[1]
-    output_model_file = args[2]
+    input_encodings_file = args[0]
+    model_path = args[1]
+    lang = "en" if len(args) == 2 else args[2]
 
-with open(input_model_file, "rb") as file:
-    model = pk.load(file)
+if lang == "en":
+    modelname = 'deepset/bert-base-cased-squad2'
+elif lang == "es":
+    modelname = ""
+else:
+    modelname = ""
 
-with open(input_train_dataset_file, "rb") as file:
-    train_dataset = pk.load(file)
+model = BertForQuestionAnswering.from_pretrained(modelname)
+tokenizer = AutoTokenizer.from_pretrained(modelname)
+
+with open(input_encodings_file, "rb") as file:
+    train_encodings = pk.load(file)
+
+class SquadDataset(torch.utils.data.Dataset):
+    def __init__(self, encodings):
+        self.encodings = encodings
+
+    def __getitem__(self, idx):
+        return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
+
+    def __len__(self):
+        return len(self.encodings.input_ids)
+
+train_dataset = SquadDataset(train_encodings)
 
 # setup GPU/CPU
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -60,5 +80,6 @@ for epoch in range(3):
         loop.set_description(f'Epoch {epoch}')
         loop.set_postfix(loss=loss.item())
 
-with open(output_file, "wb") as model_file:
-    pk.dump(model, model_file)
+
+model.save_pretrained(model_path)
+tokenizer.save_pretrained(model_path)
