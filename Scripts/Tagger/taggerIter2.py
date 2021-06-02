@@ -17,7 +17,7 @@ def pickleToJson(path):
 
 
 #%%
-with open("./config.yaml", "r+") as file:
+with open("./configIter2.yaml", "r+") as file:
     config = yaml.safe_load(file)
     filename = config["filename"]
     inputFilePickle = f"{filename}.pkl"
