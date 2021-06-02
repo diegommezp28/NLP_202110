@@ -1,12 +1,12 @@
-current_index: 250
-filename: ../tagged2iteration/1000simpleTagged_fr
+current_index: -1
+filename: ../tagged2iteration/Persona_violence_es_N2
 source_lang: auto
 tags:
-- vaccines
-- vaccination
-- mental-health
-- school-reopening
-- household-violence
-- NONE
+  - vaccines
+  - vaccination
+  - mental-health
+  - school-reopening
+  - household-violence
+  - NONE
 target_lang: es
-translate: true
+translate: false
